@@ -35,28 +35,8 @@ void Lab9::Init() {
   mouseAngle = 0;
   rightmouse = false;
   coliz = true;
-  cadou1 = true;
-  cadou2 = true;
-  cadou3 = true;
-  cadou4 = true;
-  cadou5 = true;
-  cadou6 = true;
-  cadou7 = true;
-  cadou8 = true;
-  cadou9 = true;
-  cadou10 = true;
-  cadou11 = true;
-  nr_cadouri1 = 0;
-  nr_cadouri2 = 0;
-  nr_cadouri3 = 0;
-  nr_cadouri4 = 0;
-  nr_cadouri5 = 0;
-  nr_cadouri6 = 0;
-  nr_cadouri7 = 0;
-  nr_cadouri8 = 0;
-  nr_cadouri9 = 0;
-  nr_cadouri10 = 0;
-  nr_cadouri11 = 0;
+  cadou1 = cadou2 = cadou3 = cadou4 = cadou5 = cadou6 = cadou7 = cadou8 = cadou9 = cadou10 = cadou11 = true;
+  nr_cadouri1 = nr_cadouri2 = nr_cadouri3 = nr_cadouri4 = nr_cadouri5 = nr_cadouri6 = nr_cadouri7 = nr_cadouri8 = nr_cadouri9 = nr_cadouri10 = nr_cadouri11 = 0;
 
   is_spot_light = 0;
 
@@ -245,51 +225,52 @@ void Lab9::Init() {
 
   // Light & material properties
   {
-    lightPosition = glm::vec3(0, 1, 1);
-    lightDirection = glm::vec3(0, -1, 0);
+    // Specificăm poziția luminii principale (poziția sursei de lumină)
+    glm::vec3 lightPosition = glm::vec3(0, 1, 1);
 
+    // Specificăm direcția luminii principale
+    glm::vec3 lightDirection = glm::vec3(0, -1, 0);
+
+    // Specificăm poziția și direcția pentru fiecare dintre cele 8 lumini de tip punct (point lights)
+    glm::vec3 point_light_pos[8];
+    glm::vec3 point_light_dir[8];
+
+    // Inițializăm informații pentru fiecare lumină de tip punct
+    // Lumina 1
     point_light_pos[0] = glm::vec3(-2, 0.5, -2);
     point_light_dir[0] = glm::vec3(0, -1, 0);
 
+    // Lumina 2
     point_light_pos[1] = glm::vec3(1, 0, 1);
     point_light_dir[1] = glm::vec3(0, -1, 0);
 
+    // Lumina 3
     point_light_pos[2] = glm::vec3(-3, -0.3, 3);
     point_light_dir[2] = glm::vec3(0, -1, 0);
 
+    // Lumina 4
     point_light_pos[3] = glm::vec3(3, 0, 2);
     point_light_dir[3] = glm::vec3(0, -1, 0);
 
+    // Lumina 5
     point_light_pos[4] = glm::vec3(2.5, 1, -3);
     point_light_dir[4] = glm::vec3(0, -1, 0);
 
+    // Lumina 6
     point_light_pos[5] = glm::vec3(0, 0.4, 3);
     point_light_dir[5] = glm::vec3(0, -1, 0);
 
+    // Lumina 7
     point_light_pos[6] = glm::vec3(-4, 0.3, 0);
     point_light_dir[6] = glm::vec3(0, -1, 0);
 
-    /*point_light_pos[13] = glm::vec3(0, 0.3, 1);
-     point_light_dir[13] = glm::vec3(0, -1, 0);
-
-     point_light_pos[8] = glm::vec3(-4, 0.3, 3);
-     point_light_dir[8] = glm::vec3(0, -1, 0);
-
-     point_light_pos[9] = glm::vec3(4, 0.3, 3);
-     point_light_dir[9] = glm::vec3(0, -1, 0);
-
-     point_light_pos[10] = glm::vec3(5, 0.3, -4.5);
-     point_light_dir[10] = glm::vec3(0, -1, 0);
-
-     point_light_pos[11] = glm::vec3(6.5, 0.3, 2);
-     point_light_dir[11] = glm::vec3(0, -1, 0);
-
-     point_light_pos[12] = glm::vec3(-6, 0.3, -5.5);
-     point_light_dir[12] = glm::vec3(0, -1, 0);*/
-
+    // Lumina 8
     point_light_pos[7] = glm::vec3(-4, 0.3, 0);
     point_light_dir[7] = glm::vec3(0, -1, 0);
 
+    // Specificăm proprietățile materialelor folosite pentru obiectele 3D
+    // Exemplu: Materialul are o strălucire (shininess) de 30,
+    // coeficientul difuz (Kd) este 0.5, iar coeficientul specular (Ks) este 0.5
     materialShininess = 30;
     materialKd = 0.5;
     materialKs = 0.5;
@@ -1289,31 +1270,42 @@ void Lab9::Update(float deltaTimeSeconds) {
                      mapTextures["cadou"]);
   }
 
-  // schior
-
-  {
+  // Descriem obiectul "schior"
+{
+    // Calculăm viteza schiorului bazată pe deltaTimeSeconds (rată de cadru)
     speed = deltaTimeSeconds / 5;
+
+    // Inițializăm matricea de modelare la matricea identitate
     glm::mat4 modelMatrix = glm::mat4(1);
+
+    // Translatăm obiectul la poziția specificată de coordonatele (tX, tY, tZ)
     modelMatrix = glm::translate(modelMatrix, glm::vec3(tX, tY, tZ));
+
+    // Dacă nu există coliziune (coliz == true), schiorul se mișcă în sus și înainte
     if (coliz == true) {
-      tZ = tZ + speed;
-      tY = tY - speed;
+        tZ = tZ + speed;
+        tY = tY - speed;
     }
 
+    // Rotim obiectul cu un unghi de 45 de grade în jurul axei x
     modelMatrix = glm::rotate(modelMatrix, RADIANS(45.0f), glm::vec3(1, 0, 0));
-    // modelMatrix = glm::rotate(modelMatrix, RADIANS(mouseAngle),
-    // glm::vec3(1,0,0));
 
+    // Dacă butonul drept al mouse-ului este apăsat și nu există coliziune, schiorul se mișcă spre dreapta
     if (rightmouse == true && coliz == true) {
-      tX += speed;
+        tX += speed;
     }
+
+    // Dacă butonul drept al mouse-ului nu este apăsat și nu există coliziune, schiorul se mișcă spre stânga
     if (rightmouse == false && coliz == true) {
-      tX -= speed;
+        tX -= speed;
     }
+
+    // Scalăm obiectul pentru a-l face mai mic (factor de scalare: 0.3 pe toate axe)
     modelMatrix = glm::scale(modelMatrix, glm::vec3(0.3, 0.3, 0.3));
-    RenderSimpleMesh(meshes["box"], shaders["LabShader"], modelMatrix,
-                     mapTextures["alb"]);
-  }
+
+    // Randăm obiectul folosind o funcție RenderSimpleMesh() cu parametrii corespunzători
+    RenderSimpleMesh(meshes["box"], shaders["LabShader"], modelMatrix, mapTextures["alb"]);
+}
 
   // piatra 1
   if (sqrt((tX - 5) * (tX - 5) + (tZ - 5) * (tZ - 5)) <= 0.1) {
@@ -2017,39 +2009,45 @@ void Lab9::OnInputUpdate(float deltaTime, int mods) {
 
 void Lab9::OnKeyPress(int key, int mods) {
   // Add key press event
-  if (key == GLFW_KEY_R) {
-    tX = 0;
-    tY = 13;
-    tZ = -12.5;
-    coliz = true;
-    cadou1 = true;
-    cadou2 = true;
-    cadou3 = true;
-    cadou4 = true;
-    cadou5 = true;
-    cadou6 = true;
-    cadou7 = true;
-    cadou8 = true;
-    cadou9 = true;
-    cadou10 = true;
-    cadou11 = true;
-    temporizator = 0;
-  }
+      if (key == GLFW_KEY_R) {
+        // Resetează poziția și starea obiectului "schior"
+        tX = 0;              // Poziție pe axa X
+        tY = 13;             // Poziție pe axa Y
+        tZ = -12.5;          // Poziție pe axa Z
+        coliz = true;        // Activează coliziunile
+        // Resetăm starea cadourilor
+        cadou1 = cadou2 = cadou3 = cadou4 = cadou5 = cadou6 = cadou7 = cadou8 = cadou9 = cadou10 = cadou11 = true;
+        temporizator = 0;    // Resetează temporizatorul la zero
+    }
 }
 
 void Lab9::OnKeyRelease(int key, int mods) {
   // Add key release event
 }
 
+// void Lab9::OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY) {
+//   // Add mouse move event
+//   resolution = window->GetResolution();
+//   mouseAngle = atan2(mouseX - 1280, mouseY - 720);
+//   if (mouseX > 1280 / 2) {
+//     rightmouse = true;
+//   } else {
+//     rightmouse = false;
+//   }
+// }
 void Lab9::OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY) {
-  // Add mouse move event
-  resolution = window->GetResolution();
-  mouseAngle = atan2(mouseX - 1280, mouseY - 720);
-  if (mouseX > 1280 / 2) {
-    rightmouse = true;
-  } else {
-    rightmouse = false;
-  }
+    // Eveniment de mișcare a mouse-ului
+    resolution = window->GetResolution();
+
+    // Calculăm unghiul pe baza poziției cursorului mouse-ului
+    mouseAngle = atan2(mouseX - (resolution.x / 2), mouseY - (resolution.y / 2));
+
+    // Verificăm dacă cursorul mouse-ului se află în partea dreaptă a ecranului
+    if (mouseX > resolution.x / 2) {
+        rightmouse = true;  // Cursorul mouse-ului este în partea dreaptă
+    } else {
+        rightmouse = false;  // Cursorul mouse-ului nu este în partea dreaptă
+    }
 }
 
 void Lab9::OnMouseBtnPress(int mouseX, int mouseY, int button, int mods) {
